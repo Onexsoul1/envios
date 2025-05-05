@@ -1,0 +1,4 @@
+com\envios\microservicio_envios\MicroservicioEnviosApplication.class
+com\envios\microservicio_envios\model\Envio.class
+com\envios\microservicio_envios\controller\EnvioController.class
+com\envios\microservicio_envios\repository\EnvioRepository.class
