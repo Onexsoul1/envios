@@ -4,10 +4,12 @@ import com.envios.microservicio_envios.model.Envio;
 import com.envios.microservicio_envios.repository.EnvioRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.hateoas.EntityModel;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 import java.util.List;
 
 @RestController
@@ -23,10 +25,15 @@ public class EnvioController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Envio> obtenerPorId(@PathVariable int id) {
+    public ResponseEntity<?> obtenerPorId(@PathVariable int id) {
         return envioRepository.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+            .map(envio -> {
+                EntityModel<Envio> model = EntityModel.of(envio);
+                model.add(linkTo(methodOn(EnvioController.class).obtenerPorId(id)).withSelfRel());
+                model.add(linkTo(methodOn(EnvioController.class).obtenerTodos()).withRel("todos-envios"));
+                return ResponseEntity.ok(model);
+            })
+            .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/{id}/estado")
