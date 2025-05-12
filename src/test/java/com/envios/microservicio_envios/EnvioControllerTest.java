@@ -49,5 +49,28 @@ public class EnvioControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string("Valparaíso")); 
     }
-    
+    @Test
+    void deberiaRetornarNotFoundSiEnvioNoExiste() throws Exception {
+        Mockito.when(envioRepository.findById(99)).thenReturn(Optional.empty());
+
+        mockMvc.perform(get("/envios/99/estado"))
+                .andExpect(status().isNotFound());
+    }
+    @Test
+    void deberiaRetornarEnvioCompletoPorId() throws Exception {
+        Envio envio = new Envio();
+        envio.setId(2);
+        envio.setDestinatario("Ana");
+        envio.setUbicacionActual("Santiago");
+        envio.setEstado("Entregado");
+
+        Mockito.when(envioRepository.findById(2)).thenReturn(Optional.of(envio));
+
+        mockMvc.perform(get("/envios/2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.destinatario").value("Ana"))
+                .andExpect(jsonPath("$.ubicacionActual").value("Santiago"))
+                .andExpect(jsonPath("$.estado").value("Entregado"));
+    }
+
 }
